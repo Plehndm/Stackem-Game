@@ -14,12 +14,15 @@ public class BlockMovement : MonoBehaviour
     private float moveSpeed = 0.05f;
     private bool objectAlreadyExists = false;
     private bool isActive = true;
+    
     private Rigidbody rb;
     private Collider box;
     private GameObject currentBlock;
     private BlockLogic currentScript;
 
     private Color currentColor;
+    private Color invalidPlacementColor;
+    private Color validPlacementColor;
 
     // Update is called once per frame
     void Update()
@@ -45,6 +48,8 @@ public class BlockMovement : MonoBehaviour
 
             objectAlreadyExists = true;
         }
+
+        currentBlock.GetComponent<Renderer>().material.color = !currentScript.isColliding ? validPlacementColor : invalidPlacementColor;
 
         if (Input.GetKey(LocaleControlsetter.place) && isActive && !currentScript.isColliding)
         {
