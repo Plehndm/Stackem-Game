@@ -6,23 +6,27 @@ using UnityEngine;
 public class BlockMovement : MonoBehaviour
 {
     public LocaleControlsetter LocaleControlsetter;
-
     public List<GameObject> prefabList;
     public GameObject enviornment;
+    public float rightEdge = 13;
+    public float leftEdge = -13;
+    public float bottomEdge = -13;
+    public float topEdge = 13;
     public GameObject spawnLocation;
-    public Color selectedColor;
+    private Vector3 distFromCenter = new Vector3(0, 0, 0);
     private float moveSpeed = 0.05f;
     private bool objectAlreadyExists = false;
     private bool isActive = true;
-    
+
     private Rigidbody rb;
     private Collider box;
     private GameObject currentBlock;
     private BlockLogic currentScript;
 
-    private Color currentColor;
-    private Color invalidPlacementColor;
-    private Color validPlacementColor;
+    [Header("Object Placement Colors")]
+    public Color placedColor;
+    public Color invalidPlacementColor;
+    public Color validPlacementColor;
 
     // Update is called once per frame
     void Update()
@@ -40,29 +44,24 @@ public class BlockMovement : MonoBehaviour
             box = currentBlock.GetComponent<Collider>();
             box.isTrigger = true;
 
-            currentColor = currentBlock.GetComponent<Renderer>().material.color;
-
-            currentBlock.GetComponent<Renderer>().material.color = selectedColor;
-
             currentScript = currentBlock.GetComponent<BlockLogic>();
 
             objectAlreadyExists = true;
         }
-
-        currentBlock.GetComponent<Renderer>().material.color = !currentScript.isColliding ? validPlacementColor : invalidPlacementColor;
 
         if (Input.GetKey(LocaleControlsetter.place) && isActive && !currentScript.isColliding)
         {
             isActive = false;
             rb.isKinematic = false;
             box.isTrigger = false;
-            currentBlock.GetComponent<Renderer>().material.color = currentColor;
+            currentBlock.GetComponent<Renderer>().material.color = placedColor;
             currentBlock.layer = 3;
             StartCoroutine(Wait());
         }
 
         if (isActive)
         {
+            currentBlock.GetComponent<Renderer>().material.color = !currentScript.isColliding ? validPlacementColor : invalidPlacementColor;
             currentBlock.transform.position = new Vector3(currentBlock.transform.position.x, spawnLocation.transform.position.y, currentBlock.transform.position.z);
             MoveBlockRelativeToCamera();
             RotateBlock();
@@ -119,9 +118,30 @@ public class BlockMovement : MonoBehaviour
         Vector3 forwardRelativeVerticalDirection = blockVerticalMovement * forward;
         Vector3 rightRelativeHorizontalDirection = blockHorizontalMovement * right;
 
-        // Create and apply camera relative movement
+        // Create camera relative movement
         Vector3 cameraRelativeMovement = forwardRelativeVerticalDirection + rightRelativeHorizontalDirection;
+        
+        // Check if block is trying to move out of bounds
+        if(distFromCenter.x >= rightEdge) 
+        {
+            cameraRelativeMovement.x = cameraRelativeMovement.x >=0 ? 0 : cameraRelativeMovement.x;
+        }
+        else if(distFromCenter.x <= leftEdge) 
+        {
+            cameraRelativeMovement.x = cameraRelativeMovement.x <=0 ? 0 : cameraRelativeMovement.x;
+        }
+        else if(distFromCenter.z >= topEdge) 
+        {
+            cameraRelativeMovement.z = cameraRelativeMovement.z >=0 ? 0 : cameraRelativeMovement.z;
+        }
+        else if(distFromCenter.z <= bottomEdge) 
+        {
+            cameraRelativeMovement.z = cameraRelativeMovement.z <=0 ? 0 : cameraRelativeMovement.z;
+        }
+
+        // Apply camera relative movement
         currentBlock.transform.Translate(cameraRelativeMovement.normalized * moveSpeed, Space.World);
+        distFromCenter += cameraRelativeMovement.normalized * moveSpeed;
     }
 
     IEnumerator Wait()

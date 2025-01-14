@@ -4,32 +4,47 @@ using UnityEngine;
 using TMPro;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
+using UnityEngine.EventSystems;
 
 public class GameManager : MonoBehaviour
 {
-    public GameObject winScreen;
-    public Button restartButton;
-    public bool Paused;
-    public bool isGameActive = false;
+    public GameObject winScreen1;
+    public GameObject winScreen2;
+    public GameObject goal1;
+    public GameObject goal2;
+    public GameObject playerUI;
+    private EventSystem m_EventSystem;
+    private WinGame goalScript1;
+    private WinGame goalScript2;
+
+
+    private void Awake() {
+        goalScript1 = goal1.GetComponent<WinGame>();
+        goalScript2 = goal2.GetComponent<WinGame>();
+    }
 
     public void StartGame()
     {
         Time.timeScale = 1;
-        isGameActive = true;
-        Cursor.lockState = CursorLockMode.Locked;
+        m_EventSystem = EventSystem.current;
     }
+
     void Update()
     {
-        // if (player.transform.position.y < -50)
-        // {
-        //     GameOver();
-        // }
+        if (goalScript1.playerWon || goalScript2.playerWon) {
+            WinGame();
+        }
     }
     public void WinGame()
     {
-        winScreen.gameObject.SetActive(true);
-        Cursor.lockState = CursorLockMode.None;
-        isGameActive = false;
+        playerUI.SetActive(false);
+        if (goalScript1.playerWon) {
+            winScreen1.SetActive(true);
+            m_EventSystem.SetSelectedGameObject(GameObject.Find("Restart 1"));
+        } else {
+            winScreen2.SetActive(true);
+            m_EventSystem.SetSelectedGameObject(GameObject.Find("Restart 2"));
+        }
         Time.timeScale = 0;
     }
     public void RestartGame()

@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.EventSystems;
 
 public class MenuManager : MonoBehaviour
 {
@@ -26,9 +27,12 @@ public class MenuManager : MonoBehaviour
     [SerializeField] private Toggle fullscreenToggle;
 
     private Resolution[] resolutions;
+    private EventSystem m_EventSystem;
 
     void Start()
     {
+        m_EventSystem = EventSystem.current;
+
         resolutions = Screen.resolutions;
         resolutionDropdown.ClearOptions();
         
@@ -49,7 +53,8 @@ public class MenuManager : MonoBehaviour
         resolutionDropdown.RefreshShownValue();
 
         menu.SetActive(true);
-        Cursor.lockState = CursorLockMode.None;
+        Cursor.lockState = CursorLockMode.Locked;
+        Cursor.visible = false;
     }
 
     public void PlayButton()
@@ -64,12 +69,14 @@ public class MenuManager : MonoBehaviour
     {
         menu.SetActive(false);
         optionsMenu.SetActive(true);
+        m_EventSystem.SetSelectedGameObject(GameObject.Find("Volume"));
     }
 
     public void VolumeButton()
     {
         optionsMenu.SetActive(false);
         volumeMenu.SetActive(true);
+        m_EventSystem.SetSelectedGameObject(GameObject.Find("Volume Slider"));
     }
 
     public void SetVolume()
@@ -91,12 +98,14 @@ public class MenuManager : MonoBehaviour
     {
         volumeMenu.SetActive(false);
         optionsMenu.SetActive(true);
+        m_EventSystem.SetSelectedGameObject(GameObject.Find("Volume"));
     }
 
     public void GraphicsButton()
     {
         optionsMenu.SetActive(false);
         graphicsMenu.SetActive(true);
+        m_EventSystem.SetSelectedGameObject(GameObject.Find("Resolution Dropdown"));
     }
 
     public void SetResolution(int index)
@@ -115,12 +124,14 @@ public class MenuManager : MonoBehaviour
     {
         graphicsMenu.SetActive(false);
         optionsMenu.SetActive(true);
+        m_EventSystem.SetSelectedGameObject(GameObject.Find("Volume"));
     }
 
     public void BackButton()
     {
         optionsMenu.SetActive(false);
         menu.SetActive(true);
+        m_EventSystem.SetSelectedGameObject(GameObject.Find("Start"));
     }
 
     public void QuitButton()
