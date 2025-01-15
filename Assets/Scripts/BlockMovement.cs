@@ -46,6 +46,8 @@ public class BlockMovement : MonoBehaviour
 
             currentScript = currentBlock.GetComponent<BlockLogic>();
 
+            distFromCenter = new Vector3(0, 0, 0);
+
             objectAlreadyExists = true;
         }
 

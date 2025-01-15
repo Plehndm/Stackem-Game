@@ -52,9 +52,10 @@ public class MenuManager : MonoBehaviour
         resolutionDropdown.value = resolutionIndex;
         resolutionDropdown.RefreshShownValue();
 
-        menu.SetActive(true);
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
+
+        menu.SetActive(true);
     }
 
     public void PlayButton()
